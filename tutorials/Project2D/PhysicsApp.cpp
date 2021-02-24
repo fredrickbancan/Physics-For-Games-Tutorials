@@ -6,6 +6,7 @@
 #include <Gizmos.h>
 #include <glm/ext.hpp>
 #include "Sphere.h"
+#include "AABB.h"
 #include "Plane.h"
 
 PhysicsApp::PhysicsApp() 
@@ -25,10 +26,18 @@ bool PhysicsApp::startup() {
 	physicsScene = new PhysicsScene();
 	physicsScene->setGravity({ 0,-0.98F });
 	physicsScene->setTimeStep(0.01f);
-	Sphere* ball = new Sphere({ -40, 0 }, { 10, 10 }, 6.0f, 2, { 1, 0, 0, 1 });
+	Sphere* ball = new Sphere({ -40, 0 }, { 10, 10 }, 6.0f, 2, { 1, 0.1, 0.4, 1 });
 	Sphere* ball2 = new Sphere({ 40, 0 }, { -10, 10 }, 12.0f, 4, { 1, 0, 0, 1 });
+	Sphere* ball3 = new Sphere({ 60, 0 }, {0,0}, 1.0F, 4, { 0, 0, 1, 1 });
+	AABB* box = new AABB({ 20, 0 }, { -5,5 }, 4, { 6,6 }, {1,0,0,1});
+	AABB* box2 = new AABB({ -20, 0 }, { 4,6 }, 3, { 5,5 }, { 1,0.1,0.4,1 });
+	ball3->setStatic(true);
+	ball2->setAngularVelocity(10.0F);
 	physicsScene->addActor(ball);
 	physicsScene->addActor(ball2);
+	physicsScene->addActor(ball3);
+	physicsScene->addActor(box);
+	physicsScene->addActor(box2);
 
 	Plane* bottomPlane = new Plane({ 0,1 }, -45.0F, {0,0,1,1});
 	Plane* leftPlane = new Plane({ 1,0 }, -90.0F, { 0,0,1,1 });

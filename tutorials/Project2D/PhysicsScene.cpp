@@ -104,7 +104,7 @@ bool plane2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool plane2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 {
-	return false;
+	return aabb2Plane(obj2, obj1);
 }
 
 bool sphere2Plane(PhysicsObject* obj1, PhysicsObject* obj2)
@@ -151,20 +151,23 @@ bool sphere2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool sphere2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 {
-	return false;
+	return aabb2Sphere(obj2, obj1);
 }
 
 bool aabb2Plane(PhysicsObject* obj1, PhysicsObject* obj2)
 {
+	//TODO: implement
 	return false;
 }
 
 bool aabb2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 {
+	//TODO: implement
 	return false;
 }
 
 bool aabb2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 {
+	//TODO: implement
 	return false;
 }

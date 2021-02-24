@@ -9,6 +9,7 @@ Rigidbody::Rigidbody(ShapeType shapeID, glm::vec2 position, glm::vec2 velocity, 
 	this->mass = mass;
 	angularVelocity = 0;
 	momentOfInertia = 0;
+	isStatic = false;
 }
 
 Rigidbody::~Rigidbody()
@@ -17,6 +18,7 @@ Rigidbody::~Rigidbody()
 
 void Rigidbody::fixedUpdate(glm::vec2 gravity, float timeStep)
 {
+	if (isStatic) return;
 	position += velocity * timeStep;
 	applyForce(gravity * mass, position);
 	orientation += angularVelocity * timeStep;
@@ -24,8 +26,12 @@ void Rigidbody::fixedUpdate(glm::vec2 gravity, float timeStep)
 
 void Rigidbody::applyForce(glm::vec2 force, glm::vec2 contactPos)
 {
+	if (isStatic) return;
+
 	// use getMass() and getMoment() here in case we ever get it to do something more than just return mass...
 	velocity += force / getMass();
+
+	if(getMomentOfInertia())
 	angularVelocity += (force.y * contactPos.x - force.x * contactPos.y) / getMomentOfInertia();
 }
 
@@ -49,13 +55,22 @@ void Rigidbody::resolveCollision(Rigidbody* actor2, glm::vec2 contact, glm::vec2
 	{
 		// calculate the effective mass at contact point for each object
 		// ie how much the contact point will move due to the force applied.
-		float mass1 = 1.0f / (1.0f / mass + (r1 * r1) / momentOfInertia);
-		float mass2 = 1.0f / (1.0f / actor2->mass + (r2 * r2) / actor2->momentOfInertia);
+		float mass1 = 1.0f / (1.0f / mass + (r1 * r1) / (momentOfInertia ? momentOfInertia : 0.0001F));
+		float mass2 = 1.0f / (1.0f / actor2->mass + (r2 * r2) / (actor2->momentOfInertia ? actor2->momentOfInertia : 0.0001F));
 		float elasticity = 1;
 		glm::vec2 force = (1.0f + elasticity) * mass1 * mass2 / (mass1 + mass2) * (v1 - v2) * normal;
+
 		//apply equal and opposite forces
-		applyForce(-force, contact - position);
-		actor2->applyForce(force, contact - actor2->position);
+		if (!isStatic)
+		{
+			applyForce(-force, contact - position);
+			actor2->applyForce(force, contact - actor2->position);
+		}
+		else
+		{
+			actor2->applyForce(force * 2.0F, contact - actor2->position);
+		}
+
 	}
 
 }

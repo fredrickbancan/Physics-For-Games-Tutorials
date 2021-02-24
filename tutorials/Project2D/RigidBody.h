@@ -15,6 +15,8 @@ public:
 	void setVelocity(glm::vec2 vel) { velocity = vel; }
 	float getMass() { return mass; }
 	float getMomentOfInertia() { return momentOfInertia; }
+	void setAngularVelocity(float f) { angularVelocity = f; }
+	void setStatic(bool flag) { isStatic = flag; }
 protected:
 	glm::vec2 position;
 	glm::vec2 velocity;
@@ -22,4 +24,5 @@ protected:
 	float orientation; //2D so we only need a single float to represent our orientation
 	float angularVelocity;
 	float momentOfInertia;
+	bool isStatic;
 };
