@@ -23,7 +23,7 @@ bool PhysicsApp::startup() {
 	m_2dRenderer = new aie::Renderer2D();
 	m_font = new aie::Font("./font/consolas.ttf", 32);
 	physicsScene = new PhysicsScene();
-	physicsScene->setGravity({ 0,-0.08F });
+	physicsScene->setGravity({ 0,-0.98F });
 	physicsScene->setTimeStep(0.01f);
 	Sphere* ball = new Sphere({ -40, 0 }, { 10, 10 }, 6.0f, 2, { 1, 0, 0, 1 });
 	Sphere* ball2 = new Sphere({ 40, 0 }, { -10, 10 }, 12.0f, 4, { 1, 0, 0, 1 });

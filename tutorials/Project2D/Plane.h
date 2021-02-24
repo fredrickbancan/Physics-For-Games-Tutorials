@@ -11,6 +11,7 @@ public:
 	virtual void resetPosition();
 	glm::vec2 getNormal() { return normal; }
 	float getDistance() { return offset; }
+	void resolveCollision(class Rigidbody* other, glm::vec2 contactPos);
 protected:
 	glm::vec2 normal;
 	float offset;

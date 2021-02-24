@@ -1,6 +1,8 @@
 #include "Plane.h"
 #include "glm/vec2.hpp"
+#include "glm/ext.hpp"
 #include "Gizmos.h"
+#include "RigidBody.h"
 
 using namespace glm;
 
@@ -31,6 +33,14 @@ void Plane::draw()
 	//aie::Gizmos::add2DLine(start, end, colour);
 	aie::Gizmos::add2DTri(start, end, start - normal * 10.0f, colour, colour, colourFade);
 	aie::Gizmos::add2DTri(end, end - normal * 10.0f, start - normal * 10.0f, colour, colourFade, colourFade);
+}
+
+void Plane::resolveCollision(Rigidbody* other, glm::vec2 contactPos)
+{
+	float elasticity = 1;//TODO: elascticity should be made a member value of a rigidbody
+	float j = glm::dot((1 + elasticity) * other->getVelocity(), normal) / (1 / other->getMass());
+	glm::vec2 force = normal * j;
+	other->applyForce(-force, contactPos - other->getPosition());
 }
 
 void Plane::resetPosition()
