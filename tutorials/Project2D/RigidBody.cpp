@@ -58,17 +58,24 @@ void Rigidbody::resolveCollision(Rigidbody* actor2, glm::vec2 contact, glm::vec2
 		float mass1 = 1.0f / (1.0f / mass + (r1 * r1) / (momentOfInertia ? momentOfInertia : 0.0001F));
 		float mass2 = 1.0f / (1.0f / actor2->mass + (r2 * r2) / (actor2->momentOfInertia ? actor2->momentOfInertia : 0.0001F));
 		float elasticity = 1;
-		glm::vec2 force = (1.0f + elasticity) * mass1 * mass2 / (mass1 + mass2) * (v1 - v2) * normal;
+		glm::vec2 force{}; 
 
 		//apply equal and opposite forces
-		if (!isStatic)
+		if (isStatic)
 		{
+			force  = (1.0f + elasticity) * mass2 * v2 * normal;
+			actor2->applyForce(-force, contact - actor2->position);
+		}
+		else if( actor2->isStatic)
+		{
+			force = (1.0f + elasticity) * mass1 * v1 * normal;
 			applyForce(-force, contact - position);
-			actor2->applyForce(force, contact - actor2->position);
 		}
 		else
 		{
-			actor2->applyForce(force * 2.0F, contact - actor2->position);
+			force = (1.0f + elasticity) * mass1 * mass2 / (mass1 + mass2) * (v1 - v2) * normal;
+			applyForce(-force, contact - position);
+			actor2->applyForce(force, contact - actor2->position);
 		}
 
 	}

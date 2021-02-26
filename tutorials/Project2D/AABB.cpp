@@ -19,3 +19,8 @@ void AABB::draw()
 	aie::Gizmos::add2DTri(topRight, topLeft, bottomLeft, colour, colour, colour);
 	aie::Gizmos::add2DTri(bottomLeft, bottomRight, topRight, colour, colour, colour);
 }
+
+glm::vec2 AABB::clampToBox(glm::vec2 vec)
+{
+	return glm::vec2{ glm::clamp(vec.x, position.x - extents.x, position.x + extents.x), glm::clamp(vec.y, position.y - extents.y, position.y + extents.y) };
+}

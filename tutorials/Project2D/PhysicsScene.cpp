@@ -2,6 +2,7 @@
 #include "PhysicsObject.h"
 #include "Sphere.h"
 #include "Plane.h"
+#include "AABB.h"
 #include "glm/ext.hpp"
 
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
@@ -144,7 +145,6 @@ bool sphere2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 			sphere1->resolveCollision(sphere2, 0.5f * (sphere1->getPosition() + sphere2->getPosition()));
 			return true;
 		}
-		return false;
 	}
 	return false;
 }
@@ -161,13 +161,40 @@ bool aabb2Plane(PhysicsObject* obj1, PhysicsObject* obj2)
 }
 
 bool aabb2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
-{
-	//TODO: implement
+{ 
+	AABB* box = dynamic_cast<AABB*>(obj1);
+	Sphere* sphere = dynamic_cast<Sphere*>(obj2);
+
+	// if we are successful then test for collision
+	if (box != nullptr && sphere != nullptr)
+	{
+		glm::vec2 spherePos = sphere->getPosition();
+		glm::vec2 closestPoint = box->clampToBox(spherePos);
+		glm::vec2 colNorm = glm::normalize(spherePos - closestPoint);
+
+		if (glm::distance(closestPoint, spherePos) <= sphere->getRadius())
+		{
+			//collide
+			box->resolveCollision(sphere, closestPoint, &colNorm);
+			return true;
+		}
+	}
 	return false;
 }
 
 bool aabb2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 {
-	//TODO: implement
+	AABB* box1 = dynamic_cast<AABB*>(obj1);
+	AABB* box2 = dynamic_cast<AABB*>(obj2);
+	if (box1 != nullptr && box2 != nullptr)
+	{
+		if (!(box1->minX() > box2->maxX() || box1->maxX() < box2->minX() || box1->minY() > box2->maxY() || box1->maxY() < box2->minY()))
+		{
+			//TODO: implement
+			glm::vec2 box2Clamped = box1->clampToBox(box2->getPosition());
+			box1->resolveCollision(box2, box2Clamped, );
+			return true;
+		}
+	}
 	return false;
 }
