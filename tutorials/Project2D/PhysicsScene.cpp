@@ -58,13 +58,16 @@ void PhysicsScene::update(float dt)
 		accumulatedTime -= timeStep;
 		checkForCollision();
 	}
+
+	//this is useful for interpolating the rendering of physics objects in between physics steps
+	percentageToNextTick = accumulatedTime / timeStep;
 }
 
 void PhysicsScene::draw()
 {
 	for (auto pActor : actors) 
 	{
-		pActor->draw();
+		pActor->draw(percentageToNextTick);
 	}
 }
 
@@ -116,14 +119,14 @@ bool sphere2Plane(PhysicsObject* obj1, PhysicsObject* obj2)
 	//if we are successful then test for collision
 	if (sphere != nullptr && plane != nullptr)
 	{
+		if (sphere->getIsStatic()) return false;
 		glm::vec2 collisionNormal = plane->getNormal();
-		float sphereToPlane = glm::dot(sphere->getPosition(), plane->getNormal()) - plane->getDistance();
+		float sphereToPlane = glm::dot(sphere->getPosition(), plane->getNormal()) - plane->getOffset();
 		float intersection = sphere->getRadius() - sphereToPlane;
 		float velocityOutOfPlane = glm::dot(sphere->getVelocity(), plane->getNormal());
-		glm::vec2 contact = sphere->getPosition() + (collisionNormal * -sphere->getRadius());
 		if (intersection > 0 && velocityOutOfPlane < 0)
 		{
-			plane->resolveCollision(sphere, contact);
+			plane->resolveCollision(sphere);
 			return true;
 		}
 	}
@@ -140,9 +143,9 @@ bool sphere2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 	// if we are successful then test for collision
 	if (sphere1 != nullptr && sphere2 != nullptr)
 	{
-		if (glm::length(sphere1->getPosition() - sphere2->getPosition()) <= (sphere1->getRadius() + sphere2->getRadius()))
+		if (glm::length(sphere1->getPosition() - sphere2->getPosition()) < (sphere1->getRadius() + sphere2->getRadius()))
 		{
-			sphere1->resolveCollision(sphere2, 0.5f * (sphere1->getPosition() + sphere2->getPosition()));
+			sphere1->resolveCollision(sphere2);
 			return true;
 		}
 	}
@@ -156,7 +159,43 @@ bool sphere2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 
 bool aabb2Plane(PhysicsObject* obj1, PhysicsObject* obj2)
 {
-	//TODO: implement
+	AABB* box = dynamic_cast<AABB*>(obj1);
+	Plane* plane = dynamic_cast<Plane*>(obj2);
+
+	if (plane != nullptr && box != nullptr)
+	{
+		if (box->getIsStatic()) return false;
+		glm::vec2 collisionNormal = plane->getNormal();
+
+		//brute force way - OPTIMIZE THIS!
+		//There are highly optimized ways of doiing this (e.g. getting normal of plane, figure out the closest point and check that)
+		//Create an array of four vertices and set them to the corners of the AABB
+		glm::vec2 vertices[4];
+		vertices[0] = box->getPosition() - (box->getExtents()); //bottom left
+		vertices[1] = box->getPosition() + (box->getExtents()); //top right
+		vertices[2].x = vertices[0].x; //top left
+		vertices[2].y = vertices[1].y;
+		vertices[3].x = vertices[1].x; //bottom right
+		vertices[3].y = vertices[0].y;
+
+		//Loop through the points ...
+		for (int i = 0; i < 4; i++)
+		{
+			//Same as Sphere2Plane check, but with points rather than position.
+			//Perform dot product of the plane's normal against each corner of the AABB; get a scalar
+			float dotProduct = glm::dot(collisionNormal, vertices[i]);
+
+			//Check the length of the vector between each point and the plane's distance from origin (i.e. the closest point on the plane)
+			float distance = dotProduct - plane->getOffset();
+
+			if (distance < 0)
+			{
+				plane->resolveCollision(box);
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -170,12 +209,15 @@ bool aabb2Sphere(PhysicsObject* obj1, PhysicsObject* obj2)
 	{
 		glm::vec2 spherePos = sphere->getPosition();
 		glm::vec2 closestPoint = box->clampToBox(spherePos);
-		glm::vec2 colNorm = glm::normalize(spherePos - closestPoint);
+
+		if (closestPoint == spherePos) return false;
+
+		glm::vec2 colNorm = glm::normalize(closestPoint - spherePos);
 
 		if (glm::distance(closestPoint, spherePos) <= sphere->getRadius())
 		{
 			//collide
-			box->resolveCollision(sphere, closestPoint, &colNorm);
+			sphere->resolveCollision(box, &colNorm);
 			return true;
 		}
 	}
@@ -188,13 +230,30 @@ bool aabb2Aabb(PhysicsObject* obj1, PhysicsObject* obj2)
 	AABB* box2 = dynamic_cast<AABB*>(obj2);
 	if (box1 != nullptr && box2 != nullptr)
 	{
-		if (!(box1->minX() > box2->maxX() || box1->maxX() < box2->minX() || box1->minY() > box2->maxY() || box1->maxY() < box2->minY()))
+		glm::vec2 collisionNormal{};
+
+		//Subtract each AABB's position from the sum of their half extents; the difference being how far they need to be 'pushed' to not overlap
+		float hOverlap = box1->getExtents().x + box2->getExtents().x - abs(box1->getPosition().x - box2->getPosition().x);
+		float vOverlap = box1->getExtents().y + box2->getExtents().y - abs(box1->getPosition().y - box2->getPosition().y);
+
+		if (hOverlap < 0 || vOverlap < 0)
 		{
-			//TODO: implement
-			glm::vec2 box2Clamped = box1->clampToBox(box2->getPosition());
-			box1->resolveCollision(box2, box2Clamped, );
-			return true;
+			return false;
 		}
+
+		if (hOverlap < vOverlap)
+		{
+			collisionNormal = {box1->getPosition().x > box2->getPosition().x ? -1 : 1, 0};
+		}
+		else
+		{
+			collisionNormal = { 0, box1->getPosition().y > box2->getPosition().y ? -1 : 1 };
+		}
+
+		box1->resolveCollision(box2, &collisionNormal);
+
+		return true;
+		
 	}
 	return false;
 }

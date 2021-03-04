@@ -18,6 +18,7 @@ public:
 protected:
 	glm::vec2 gravity;
 	float timeStep;
+	float percentageToNextTick;//used for interpolation (temporal anti aliasing)
 	std::vector<class PhysicsObject*> actors;
 };
 

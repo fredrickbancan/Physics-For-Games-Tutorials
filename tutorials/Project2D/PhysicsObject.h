@@ -17,7 +17,7 @@ protected:
 	glm::vec4 colour;
 public:
 	virtual void fixedUpdate(glm::vec2 gravity, float timeStep) = 0;
-	virtual void draw() = 0;
+	virtual void draw(float ptnt) = 0;//ptnt stands for percentage to next tick, for temporal anti aliasing
 	virtual void resetPosition() {};
 	glm::vec4 getColour() { return colour; }
 	ShapeType getShapeType() { return shapeType; }

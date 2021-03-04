@@ -11,9 +11,10 @@ Sphere::~Sphere()
 
 }
 
-void Sphere::draw()
+void Sphere::draw(float ptnt)
 {
+	glm::vec2 lp = lerpPos(ptnt);
 	glm::vec2 end = glm::vec2(std::cos(orientation), std::sin(orientation)) * radius;
-	aie::Gizmos::add2DCircle(position, radius, 32, colour);
-	aie::Gizmos::add2DLine(position, position + end, glm::vec4(1, 1, 1, 1));
+	aie::Gizmos::add2DCircle(lp, radius, 32, colour);
+	aie::Gizmos::add2DLine(lp, lp + end, glm::vec4(1, 1, 1, 1));
 }        

@@ -7,6 +7,7 @@ class PhysicsApp : public aie::Application {
 public:
 
 	PhysicsApp();
+	static float lerp(float start, float end, float power) { return start + (end - start) * power; }
 	virtual ~PhysicsApp();
 
 	virtual bool startup();

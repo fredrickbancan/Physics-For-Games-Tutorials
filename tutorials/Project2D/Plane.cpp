@@ -20,7 +20,7 @@ void Plane::fixedUpdate(glm::vec2 gravity, float timeStep)
 {
 }
 
-void Plane::draw()
+void Plane::draw(float ptnt)
 {
 	float lineSegmentLength = 300;
 	vec2 centerPoint = normal * offset;
@@ -35,12 +35,12 @@ void Plane::draw()
 	aie::Gizmos::add2DTri(end, end - normal * 10.0f, start - normal * 10.0f, colour, colourFade, colourFade);
 }
 
-void Plane::resolveCollision(Rigidbody* other, glm::vec2 contactPos)
+void Plane::resolveCollision(Rigidbody* other)
 {
 	float elasticity = 1;//TODO: elascticity should be made a member value of a rigidbody
-	float j = glm::dot((1 + elasticity) * other->getVelocity(), normal) / (1 / other->getMass());
-	glm::vec2 force = normal * j;
-	other->applyForce(-force, contactPos - other->getPosition());
+	float j = glm::dot((1 + elasticity) * other->getVelocity(), normal);
+	glm::vec2 force = normal * (j < 0 ? j : 0);
+	other->applyForce(-force * other->getMass());
 }
 
 void Plane::resetPosition()

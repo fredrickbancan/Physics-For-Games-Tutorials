@@ -7,7 +7,7 @@ class AABB : public Rigidbody
 public:
 	AABB(glm::vec2 position, glm::vec2 velocity, float mass, glm::vec2 extents, glm::vec4 colour);
 	~AABB();
-	virtual void draw();
+	virtual void draw(float ptnt);
 	glm::vec2 clampToBox(glm::vec2 vec);
 	glm::vec2 getExtents() { return extents; }
 	float minX() { return position.x - extents.x; }

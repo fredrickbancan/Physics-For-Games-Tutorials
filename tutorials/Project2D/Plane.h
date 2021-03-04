@@ -7,11 +7,11 @@ public:
 	Plane(glm::vec2 normal, float distance, glm::vec4 colour);
 	~Plane();
 	virtual void fixedUpdate(glm::vec2 gravity, float timeStep);
-	virtual void draw();
+	virtual void draw(float ptnt);
 	virtual void resetPosition();
 	glm::vec2 getNormal() { return normal; }
-	float getDistance() { return offset; }
-	void resolveCollision(class Rigidbody* other, glm::vec2 contactPos);
+	float getOffset() { return offset; }
+	void resolveCollision(class Rigidbody* other);
 protected:
 	glm::vec2 normal;
 	float offset;

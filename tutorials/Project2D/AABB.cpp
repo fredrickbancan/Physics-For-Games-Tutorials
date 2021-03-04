@@ -10,12 +10,13 @@ AABB::~AABB()
 {
 }
 
-void AABB::draw()
+void AABB::draw(float ptnt)
 {
-	glm::vec2 topLeft = { (-extents.x) + position.x, extents.y + position.y};
-	glm::vec2 topRight = { extents.x + position.x, extents.y + position.y };
-	glm::vec2 bottomLeft = { (-extents.x) + position.x, (-extents.y) + position.y };
-	glm::vec2 bottomRight = { extents.x + position.x, (-extents.y) + position.y };
+	glm::vec2 lp = lerpPos(ptnt);
+	glm::vec2 topLeft = { (-extents.x) + lp.x, extents.y + lp.y};
+	glm::vec2 topRight = { extents.x + lp.x, extents.y + lp.y };
+	glm::vec2 bottomLeft = { (-extents.x) + lp.x, (-extents.y) + lp.y };
+	glm::vec2 bottomRight = { extents.x + lp.x, (-extents.y) + lp.y };
 	aie::Gizmos::add2DTri(topRight, topLeft, bottomLeft, colour, colour, colour);
 	aie::Gizmos::add2DTri(bottomLeft, bottomRight, topRight, colour, colour, colour);
 }
