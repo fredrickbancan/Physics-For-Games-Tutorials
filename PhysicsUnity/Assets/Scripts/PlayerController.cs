@@ -12,7 +12,11 @@ public class PlayerController : MonoBehaviour
     private float jumpHeight = 1.0f;
 
     [SerializeField]
+    private float objectPushForce = 172.0F;
+
+    [SerializeField]
     private float mouseSensitivity = 3.5F;
+
 
     private Vector3 playerVelocity = new Vector3();
 
@@ -95,13 +99,21 @@ public class PlayerController : MonoBehaviour
         }
         controller.Move(move * accel * Time.deltaTime);
         controller.Move(playerVelocity * Time.deltaTime);
+        if(move == Vector3.zero)
+        {
+            playerCollider.velocity = Vector3.zero;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         //push other objects away to simulate physics from player, or player pushing objects
-        collision.rigidbody.velocity = collision.rigidbody.velocity + (-collision.contacts[0].normal * 10.0F);
+        if (playerCollider != null && collision.contacts != null && collision != null && collision.rigidbody != null)
+        {
+            collision.rigidbody.AddForce(collision.rigidbody.velocity + (-collision.contacts[0].normal * objectPushForce) * playerCollider.velocity.magnitude * Mathf.Clamp(Vector3.Dot(playerCollider.velocity.normalized, -collision.contacts[0].normal), 0.0F, 1.0F), ForceMode.Force);
+        }
     }
+
 
     private void updateCamera()
     {

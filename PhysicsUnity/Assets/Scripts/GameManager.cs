@@ -2,34 +2,56 @@
 
 public class GameManager : MonoBehaviour
 {
-    private static GameManager privateInstance;
-    public static GameManager instance
+    public static GameManager instance = null;
+
+    private GameObject playerSpawn = null;
+    
+    [SerializeField]
+    private GameObject playerPrefab = null;
+
+    private bool error = false;
+
+    /// <summary>
+    /// creating singleton instance
+    /// </summary>
+    void Awake()
     {
-        get
+        if(instance)
         {
-            if (privateInstance == null)
-            {
-                privateInstance = FindObjectOfType<GameManager>();
-                if (privateInstance == null)
-                {
-                    GameObject obj = new GameObject();
-                    obj.name = typeof(GameManager).Name;
-                    privateInstance = obj.AddComponent<GameManager>();
-                }
-            }
-            return privateInstance;
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(this);
+            instance = this;
         }
     }
 
-    void Awake()
-    {
-
-    }
     void Start()
     {
-       
+        playerSpawn = GameObject.Find("PlayerSpawn");
+        if(!playerSpawn)
+        {
+            Debug.LogError("GameManager could not find player spawn object!");
+            error = true;
+            return;
+        }
+        spawnPlayer();
     }
+
+    public void spawnPlayer()
+    {
+        if (!playerPrefab)
+        {
+            Debug.LogError("GameManager could not spawn player! object is provided with null player prefab!");
+            error = true;
+            return;
+        }
+        Instantiate(playerPrefab, playerSpawn.transform.position, Quaternion.identity);
+    }
+
     void Update()
     {
+        if (error) return;
     }
 }
