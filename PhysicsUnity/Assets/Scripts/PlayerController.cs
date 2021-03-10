@@ -99,10 +99,6 @@ public class PlayerController : MonoBehaviour
         }
         controller.Move(move * accel * Time.deltaTime);
         controller.Move(playerVelocity * Time.deltaTime);
-        if(move == Vector3.zero)
-        {
-            playerCollider.velocity = Vector3.zero;
-        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -113,7 +109,6 @@ public class PlayerController : MonoBehaviour
             collision.rigidbody.AddForce(collision.rigidbody.velocity + (-collision.contacts[0].normal * objectPushForce) * playerCollider.velocity.magnitude * Mathf.Clamp(Vector3.Dot(playerCollider.velocity.normalized, -collision.contacts[0].normal), 0.0F, 1.0F), ForceMode.Force);
         }
     }
-
 
     private void updateCamera()
     {

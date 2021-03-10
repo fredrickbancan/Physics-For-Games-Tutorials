@@ -63,7 +63,7 @@ public class GameManager : MonoBehaviour
             error = true;
             return;
         }
-        Instantiate(playerPrefab, playerSpawn.transform.position, Quaternion.identity);
+        Instantiate(playerPrefab, playerSpawn.transform.position, playerSpawn.transform.rotation);
     }
 
     public void spawnRagdolls()

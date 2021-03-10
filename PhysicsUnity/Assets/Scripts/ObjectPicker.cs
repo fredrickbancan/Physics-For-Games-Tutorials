@@ -48,7 +48,7 @@ public class ObjectPicker : MonoBehaviour
                 RaycastHit hitInfo = new RaycastHit();
                 if (Physics.Raycast(new Ray(playerCam.transform.position, playerCam.transform.forward), out hitInfo, 1000.0F))
                 {
-                    if(hitInfo.collider.attachedRigidbody != null && hitInfo.collider.gameObject != player)
+                    if(!hitInfo.collider.isTrigger && hitInfo.collider.GetComponent<Rigidbody>() != null && hitInfo.collider.gameObject != player)
                     {
                         //pick the object if it has a rigidbody and is not the player.
                         currentPickedObject = hitInfo.collider.gameObject;
