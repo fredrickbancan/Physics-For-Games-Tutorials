@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1238990042594778776}
   - component: {fileID: 6264110246310873418}
   - component: {fileID: 8805071528403217718}
+  - component: {fileID: 8506911919819657201}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -147,7 +148,21 @@ MonoBehaviour:
   player: {fileID: 6264110246310873419}
   accel: 10
   jumpHeight: 1
+  objectPushForce: 172
   mouseSensitivity: 1
+--- !u!114 &8506911919819657201
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6264110246310873419}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0b3af7a5737e7b41866ca909c0b04c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 6264110246310873419}
 --- !u!1 &6264110246967818002
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,9 +5,13 @@ public class GameManager : MonoBehaviour
     public static GameManager instance = null;
 
     private GameObject playerSpawn = null;
+    private GameObject[] ragdollSpawns = null;
     
     [SerializeField]
     private GameObject playerPrefab = null;
+
+    [SerializeField]
+    private GameObject ragdollPrefab = null;
 
     private bool error = false;
 
@@ -32,11 +36,23 @@ public class GameManager : MonoBehaviour
         playerSpawn = GameObject.Find("PlayerSpawn");
         if(!playerSpawn)
         {
-            Debug.LogError("GameManager could not find player spawn object!");
+            Debug.LogError("GameManager could not find player spawn point object!");
             error = true;
             return;
         }
+
         spawnPlayer();
+
+        ragdollSpawns = GameObject.FindGameObjectsWithTag("Ragdoll Spawn");
+
+        if(ragdollSpawns == null || ragdollSpawns.Length == 0)
+        {
+            Debug.LogError("GameManager could not find any ragdoll spawn points!");
+            error = true;
+            return;
+        }
+
+        spawnRagdolls();
     }
 
     public void spawnPlayer()
@@ -48,6 +64,21 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instantiate(playerPrefab, playerSpawn.transform.position, Quaternion.identity);
+    }
+
+    public void spawnRagdolls()
+    {
+        if (!ragdollPrefab)
+        {
+            Debug.LogError("GameManager could not spawn ragdolls! object is provided with null ragdoll prefab!");
+            error = true;
+            return;
+        }
+
+        foreach (GameObject g in ragdollSpawns)
+        {
+            Instantiate(ragdollPrefab, g.transform.position, g.transform.rotation);
+        }
     }
 
     void Update()
