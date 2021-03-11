@@ -31,6 +31,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// get all requried objects and spawn ragdolls
+    /// </summary>
     void Start()
     {
         playerSpawn = GameObject.Find("PlayerSpawn");

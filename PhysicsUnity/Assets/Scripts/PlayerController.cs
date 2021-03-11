@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Script for player movement and some physics interaction
+/// </summary>
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
@@ -30,6 +33,9 @@ public class PlayerController : MonoBehaviour
     private float camRotY = 0.0F;
     private float prevMouseX = 0.0F;
 
+    /// <summary>
+    /// get all required objects and lock mouse
+    /// </summary>
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Confined;
@@ -74,6 +80,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// update camera based on mouse movement, and move player based on player front vector and keys pressed
+    /// </summary>
     void Update()
     {
         if (error) return;
@@ -101,9 +110,12 @@ public class PlayerController : MonoBehaviour
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
+    /// <summary>
+    /// apon colliding with physics object push it away to simulate proper interaction with player velocity.
+    /// If player velocity is in a differing direction from the collision normal, then push the object less.
+    /// </summary>
     private void OnCollisionEnter(Collision collision)
     {
-        //push other objects away to simulate physics from player, or player pushing objects
         if (playerCollider != null && collision.contacts != null && collision != null && collision.rigidbody != null)
         {
             collision.rigidbody.AddForce(collision.rigidbody.velocity + (-collision.contacts[0].normal * objectPushForce) * playerCollider.velocity.magnitude * Mathf.Clamp(Vector3.Dot(playerCollider.velocity.normalized, -collision.contacts[0].normal), 0.0F, 1.0F), ForceMode.Force);

@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Script which can be added to a player with a camera. allows the user to click and drag on objects to move them around with a spring joint.
+/// </summary>
 public class ObjectPicker : MonoBehaviour
 {
     [SerializeField]
@@ -10,6 +13,10 @@ public class ObjectPicker : MonoBehaviour
     private GameObject grabAnchor = null;
 
     private Camera playerCam = null;
+
+    private SpringJoint grabSpring = null;//spring connected to grabbed object
+
+    private Rigidbody grabAnchorBody = null;//rigid body of grab anchor, required for spring attachments.
 
     private bool error = false;
 
@@ -33,7 +40,10 @@ public class ObjectPicker : MonoBehaviour
 
         grabAnchor = new GameObject("Grab Anchor");
         grabAnchor.transform.parent = playerCam.transform;
-        grabAnchor.AddComponent<Rigidbody>().isKinematic = true;
+        grabAnchorBody = grabAnchor.AddComponent<Rigidbody>();
+        grabAnchorBody.useGravity = false;
+        grabAnchorBody.isKinematic = true;
+        grabAnchorBody.constraints = RigidbodyConstraints.FreezeAll;
     }
 
     void Update()
@@ -63,18 +73,20 @@ public class ObjectPicker : MonoBehaviour
             onObjectUnPick();
             currentPickedObject = null;
         }
-        
     }
 
 
     private void doStuffWithPickedObject(Vector3 grabPos)
     {
         grabAnchor.transform.position = grabPos;
-        currentPickedObject.AddComponent<SpringJoint>().damper = 0.0F;
-        currentPickedObject.GetComponent<SpringJoint>().spring = 100.0F;
-        currentPickedObject.GetComponent<SpringJoint>().massScale = 10.0F;
-        currentPickedObject.GetComponent<SpringJoint>().connectedBody = grabAnchor.GetComponent<Rigidbody>();
-        currentPickedObject.GetComponent<SpringJoint>().connectedAnchor = grabAnchor.transform.position;
+        grabSpring = currentPickedObject.AddComponent<SpringJoint>();
+        grabSpring.autoConfigureConnectedAnchor = false;
+        grabSpring.connectedBody = grabAnchor.GetComponent<Rigidbody>();
+        grabSpring.connectedAnchor = new Vector3(0.0001F, 0, 0);
+        grabSpring.anchor = new Vector3(0.0001F, 0, 0);
+        grabSpring.damper = 2.6F;
+        grabSpring.spring = 10.0F;
+        grabSpring.massScale = 100.0F;
     }
 
 
@@ -85,9 +97,10 @@ public class ObjectPicker : MonoBehaviour
         {
             foreach(SpringJoint sj in pickedObjectSprings)
             {
-                if(sj.connectedBody == grabAnchor.GetComponent<Rigidbody>())
+                if(sj.connectedBody.gameObject == grabAnchor)
                 {
                     Destroy(sj);
+                    return;
                 }
             }
         }

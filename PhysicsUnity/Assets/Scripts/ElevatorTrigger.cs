@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Script which can be added to a trigger, provided a platfrom object, and simulates a simple elevator.
+/// </summary>
 public class ElevatorTrigger : MonoBehaviour
 {
     [SerializeField]
@@ -23,7 +26,7 @@ public class ElevatorTrigger : MonoBehaviour
 
     private float touchTimer = 0.0F;//how long an object has been in the trigger
 
-    private CharacterController playerPassenger = null;
+    private CharacterController playerPassenger = null;//used for moving the player manually to avoid issues
 
     private bool error;
 
@@ -40,7 +43,7 @@ public class ElevatorTrigger : MonoBehaviour
     {
         if (error) return;
 
-        if(isProgressing)
+        if(isProgressing)//move towards top floor
         {
             if (topFloorHeight > groundFloorHeight)//incase somebody wants to make an elevator that works downwards instead
             {
@@ -57,13 +60,14 @@ public class ElevatorTrigger : MonoBehaviour
             {
                 if (elevatorPlatform.transform.position.y > topFloorHeight)
                     elevatorPlatform.transform.Translate(-Vector3.up * moveSpeed * Time.deltaTime, Space.World);
+
                 if (playerPassenger != null)
                 {
                     playerPassenger.Move(-Vector3.up * moveSpeed * Time.deltaTime);
                 }
             }
         }
-        else
+        else//move towards bottom floor
         {
             if (topFloorHeight > groundFloorHeight)//incase somebody wants to make an elevator that works downwards instead
             {
@@ -108,6 +112,9 @@ public class ElevatorTrigger : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// if the player enters this trigger, get their character controller for translation when elevator moves.
+    /// </summary>
     private void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Player")
@@ -121,6 +128,9 @@ public class ElevatorTrigger : MonoBehaviour
         hasPassenger = true;
     }
 
+    /// <summary>
+    /// if the player leaves then reset the playerPassenger var to null so we stop translating the player.
+    /// </summary>
     private void OnTriggerExit(Collider other)
     {
         if (other.tag == "Player")
